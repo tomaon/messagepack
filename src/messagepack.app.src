@@ -1,0 +1,7 @@
+%% -*- erlang -*-
+{application, messagepack,
+ [
+  {description, "MessagePack for Erlang / Elixir"},
+  {vsn, {cmd, "cat VERSION"}},
+  {applications, [kernel, stdlib]}
+ ]}.

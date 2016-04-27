@@ -1,0 +1,8 @@
+.mix/
+.rebar3/
+deps
+*.beam
+*.dump
+*.lock
+*.o
+*~
