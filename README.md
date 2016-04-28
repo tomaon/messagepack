@@ -1,20 +1,22 @@
 # [MessagePack][1] for [Elixir][2] / [Erlang][3]
 
+[![Build Status](https://travis-ci.org/tomaon/messagepack.svg?branch=master)](https://travis-ci.org/tomaon/messagepack)
+
 ## Installation
 
 Add `messagepack` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-[{:messagepack, "x.y.z"}]
+  [{:messagepack, "x.y.z"}]
 end
 ```
 
 or `rebar.config`:
 ```erlang
 {deps, [
-{messagepack, "x.y.z"},
-]}.
+        {messagepack, "x.y.z"},
+       ]}.
 ```
 ## Example
 
