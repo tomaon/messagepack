@@ -8,7 +8,7 @@ Add `messagepack` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:messagepack, "x.y.z"}]
+  [{:messagepack, "== x.y.z"}]
 end
 ```
 
@@ -28,7 +28,11 @@ iex(1)> defmodule Example do
 {:module, Example, <<...>>, %Example{compact: nil, schema: nil}}
 iex(2)> x = %Example{:compact => true, :schema => 0}
 %Example{compact: true, schema: 0}
-iex(3)> x = Messagepack.decode!(Messagepack.encode!(x))
+iex(3)> b = Messagepack.encode!(x)
+<<...>>
+iex(4)> byte_size(b)
+44
+iex(5)> x = Messagepack.decode!(b)
 %Example{compact: true, schema: 0}
 ```
 
@@ -38,7 +42,9 @@ erlang:
 #{compact => true,schema => 0}
 2> {ok, B} = messagepack:encode(X).
 {ok,<<130,167,99,111,109,112,97,99,116,195,166,115,99,104,101,109,97,0>>}
-3> messagepack:decode(B).
+3> byte_size(B).
+18
+4> {ok, X} = messagepack:decode(B).
 {ok,#{compact => true,schema => 0}}
 ```
 
