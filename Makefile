@@ -22,13 +22,13 @@ $(VERBOSE).SILENT:
 
 all: clean compile
 
-clean compile test: rm
+clean compile deps.get docs test: rm
 	$(ENV) $(MIX) $@
 
 cover: rm
 	$(ENV) $(MIX) test --$@
 
-distclean: rm-lock
+distclean: rm-deps rm-doc rm-lock
 	rm -rf $(WORK)
 
 #
@@ -44,5 +44,9 @@ rm: rm-autosave
 
 rm-autosave:
 	find . -name "*~" | xargs rm -f
+rm-deps:
+	rm -rf deps
+rm-doc:
+	rm -rf doc
 rm-lock:
 	rm -f *.lock
