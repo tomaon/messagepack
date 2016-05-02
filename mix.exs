@@ -11,6 +11,8 @@ defmodule Messagepack.Mixfile do
       compilers: [:erlang, :elixir, :app],
       build_path: ".mix",
 
+      deps: deps,
+
       elixirc_options: [
         {:debug_info, true},
         {:warnings_as_errors, true},
@@ -32,6 +34,13 @@ defmodule Messagepack.Mixfile do
 
       description: "MessagePack for Erlang / Elixir",
       package: package,
+    ]
+  end
+
+  defp deps do
+    [
+      {:earmark, "~> 0.2.1", only: :dev},
+      {:ex_doc, "~> 0.11.5", only: :dev}
     ]
   end
 

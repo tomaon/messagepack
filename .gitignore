@@ -1,6 +1,7 @@
 .mix/
 .rebar3/
-deps
+deps/
+doc/
 *.beam
 *.dump
 *.lock
