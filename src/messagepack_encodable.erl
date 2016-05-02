@@ -51,9 +51,7 @@ encode(Term, Options) when is_pid(Term) ->
 encode(Term, Options) when is_port(Term) ->
     encode_port(Term, Options);
 encode(Term, Options) when is_reference(Term) ->
-    encode_reference(Term, Options);
-encode(Term, Options) ->
-    error_badarg(Term, Options).
+    encode_reference(Term, Options).
 
 %% == private ==
 
@@ -121,9 +119,9 @@ encode_reference(R, O) ->
 encode_string(S, O) ->
     U = byte_size(S),
     if ?U5_MAX  >= U -> {ok, << 2#101:3, U: 5/big-unsigned, S/binary>>};
-       ?U8_MAX  >= U -> {ok, <<16#d9,    U: 8/big-unsigned, S/binary>>};
-       ?U16_MAX >= U -> {ok, <<16#da,    U:16/big-unsigned, S/binary>>};
-       ?U32_MAX >= U -> {ok, <<16#db,    U:32/big-unsigned, S/binary>>};
+       ?U8_MAX  >= U -> {ok, <<16#d9,    U: 8/big-unsigned, S/binary>>}; % limit(atom)
+    %  ?U16_MAX >= U -> {ok, <<16#da,    U:16/big-unsigned, S/binary>>}
+    %  ?U32_MAX >= U -> {ok, <<16#db,    U:32/big-unsigned, S/binary>>}
        true          -> error_badarg(S, O)
     end.
 
