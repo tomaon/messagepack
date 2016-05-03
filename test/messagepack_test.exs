@@ -186,9 +186,6 @@ defmodule MessagepackTest do
     Enum.map([
       {:ok, hd(:erlang.ports())},     # 10.9 : PORT_EXT(102) = 26
     ], &do_test/1)
-
-    Enum.map([
-    ], &do_decode/1)
   end
 
   test "ext format family / reference" do
@@ -209,10 +206,8 @@ defmodule MessagepackTest do
       {:ok, :erlang.list_to_tuple(:erlang.binary_to_list(binary_part(bin, 0, 256)))},
       {:ok, :erlang.list_to_tuple(:erlang.binary_to_list(binary_part(bin, 0, 65535)))},
       {:ok, :erlang.list_to_tuple(:erlang.binary_to_list(binary_part(bin, 0, 65536)))}
-      # 16777215 (limit?, TODO)
       # 67108863 (limit)
     ], &do_test/1)
-
     Enum.map([
       {:error, <<0xc1>>, <<0xd4,0x05,0xc1>>},
     ], &do_decode/1)

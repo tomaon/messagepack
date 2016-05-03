@@ -208,10 +208,13 @@ decode_str(B, _O, S, C, T) when ?U8_MAX >= C ->
             {ok, P, T+C}
     end;
 decode_str(B, _O, S, C, T) ->
-    {ok, binary_part(B, S, C), T+C}.
+    {ok, binary_part(B, S, C), T+C}. % != badarg, == SystemLimitError
 
-decode_tuple(_B, _O, _S, 0, T, L) ->
-    {ok, list_to_tuple(lists:reverse(L)), T};
+decode_tuple(_B, O, _S, 0, T, L) ->
+    U = length(L),
+    if ?U26_MAX >= U -> {ok, list_to_tuple(lists:reverse(L)), T};
+       true          -> error(U, O)
+    end;
 decode_tuple(B, O, S, C, T, L) ->
     case decode_binary(B, O, S) of
         {ok, E, U} ->
