@@ -4,7 +4,7 @@
 
  IEX ?= iex
  MIX ?= mix
- REBAR ?= ../../../bin/rebar3
+ REBAR ?= rebar3
 
  ENV  =
 #ENV += MIX_ENV=prod

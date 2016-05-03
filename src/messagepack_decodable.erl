@@ -190,7 +190,7 @@ decode_map(B, O, S, C, T, M) ->
         {ok, K, KU} ->
             case decode_binary(B, O, S + KU) of
                 {ok, V, VU} ->
-                    decode_map(B, O, S+KU+VU, C-1, T+KU+VU, maps:put(K,V,M));
+                    decode_map(B, O, S+KU+VU, C-1, T+KU+VU, maps:put(K, V, M));
                 {error, Reason} ->
                     {error, Reason}
             end;
@@ -198,7 +198,7 @@ decode_map(B, O, S, C, T, M) ->
             {error, Reason}
     end.
 
-decode_str(B, _O, S, C, T) ->
+decode_str(B, _O, S, C, T) when ?U8_MAX >= C ->
     P = binary_part(B, S, C),
     try binary_to_existing_atom(P, utf8) of
         A ->
@@ -206,7 +206,9 @@ decode_str(B, _O, S, C, T) ->
     catch
         error:badarg ->
             {ok, P, T+C}
-    end.
+    end;
+decode_str(B, _O, S, C, T) ->
+    {ok, binary_part(B, S, C), T+C}.
 
 decode_tuple(_B, _O, _S, 0, T, L) ->
     {ok, list_to_tuple(lists:reverse(L)), T};
