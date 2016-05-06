@@ -50,147 +50,147 @@ decode_binary(B, O, S) ->
     case binary_part(B, S, 1) of
         %% nil format family
         <<16#c0>> ->
-            {ok, nil, 1};
+            {ok, nil, S+1};
         %% bool format family
         <<16#c2>> ->
-            {ok, false, 1};
+            {ok, false, S+1};
         <<16#c3>> ->
-            {ok, true, 1};
+            {ok, true, S+1};
         %% int format family (unsigned)
         X when X >= <<16#00>>, X =< <<16#7f>> ->
             <<U:8/big-unsigned>> = binary_part(B, S, 1),
-            {ok, U, 1};
+            {ok, U, S+1};
         <<16#cc>> ->
             <<U:8/big-unsigned>> = binary_part(B, S+1, 1),
-            {ok, U, 1+1};
+            {ok, U, S+1+1};
         <<16#cd>> ->
             <<U:16/big-unsigned>> = binary_part(B, S+1, 2),
-            {ok, U, 1+2};
+            {ok, U, S+1+2};
         <<16#ce>> ->
             <<U:32/big-unsigned>> = binary_part(B, S+1, 4),
-            {ok, U, 1+4};
+            {ok, U, S+1+4};
         <<16#cf>> ->
             <<U:64/big-unsigned>> = binary_part(B, S+1, 8),
-            {ok, U, 1+8};
+            {ok, U, S+1+8};
         %% int format family (signed)
         X when X >= <<16#e0>>, X =< <<16#ff>> ->
             <<2#11:2, I:6/big-signed>> = binary_part(B, S, 1),
-            {ok, I, 1};
+            {ok, I, S+1};
         <<16#d0>> ->
             <<I:8/big-signed>> = binary_part(B, S+1, 1),
-            {ok, I, 1+1};
+            {ok, I, S+1+1};
         <<16#d1>> ->
             <<I:16/big-signed>> = binary_part(B, S+1, 2),
-            {ok, I, 1+2};
+            {ok, I, S+1+2};
         <<16#d2>> ->
             <<I:32/big-signed>> = binary_part(B, S+1, 4),
-            {ok, I, 1+4};
+            {ok, I, S+1+4};
         <<16#d3>> ->
             <<I:64/big-signed>> = binary_part(B, S+1, 8),
-            {ok, I, 1+8};
+            {ok, I, S+1+8};
         %% float format family
         <<16#ca>> ->
             <<F:32/big-float>> = binary_part(B, S+1, 4),
-            {ok, F, 1+4};
+            {ok, F, S+1+4};
         <<16#cb>> ->
             <<F:64/big-float>> = binary_part(B, S+1, 8),
-            {ok, F, 1+8};
+            {ok, F, S+1+8};
         %% str format family
         X when X >= <<16#a0>>, X =< <<16#bf>> ->
             <<2#101:3, U:5/big-unsigned>> = binary_part(B, S, 1),
-            decode_str(B, O, S+1, U, 1);
+            decode_str(B, O, S+1, U);
         <<16#d9>> ->
             <<U:8/big-unsigned>> = binary_part(B, S+1, 1),
-            decode_str(B, O, S+1+1, U, 1+1);
+            decode_str(B, O, S+1+1, U);
         <<16#da>> ->
             <<U:16/big-unsigned>> = binary_part(B, S+1, 2),
-            decode_str(B, O, S+1+2, U, 1+2);
+            decode_str(B, O, S+1+2, U);
         <<16#db>> ->
             <<U:32/big-unsigned>> = binary_part(B, S+1, 4),
-            decode_str(B, O, S+1+4, U, 1+4);
+            decode_str(B, O, S+1+4, U);
         %% bin format family
         <<16#c4>> ->
             <<U:8/big-unsigned>> = binary_part(B, S+1, 1),
-            {ok, binary_part(B, S+1+1, U), 1+1+U};
+            {ok, binary_part(B, S+1+1, U), S+1+1+U};
         <<16#c5>> ->
             <<U:16/big-unsigned>> = binary_part(B, S+1, 2),
-            {ok, binary_part(B, S+1+2, U), 1+2+U};
+            {ok, binary_part(B, S+1+2, U), S+1+2+U};
         <<16#c6>> ->
             <<U:32/big-unsigned>> = binary_part(B, S+1, 4),
-            {ok, binary_part(B, S+1+4, U), 1+4+U};
+            {ok, binary_part(B, S+1+4, U), S+1+4+U};
         %% array format family
         X when X >= <<16#90>>, X =< <<16#9f>> ->
             <<2#1001:4, U:4/big-unsigned>> = binary_part(B, S, 1),
-            decode_array(B, O, S+1, U, 1, []);
+            decode_array(B, O, S+1, U, []);
         <<16#dc>> ->
             <<U:16/big-unsigned>> = binary_part(B, S+1, 2),
-            decode_array(B, O, S+1+2, U, 1+2, []);
+            decode_array(B, O, S+1+2, U, []);
         <<16#dd>> ->
             <<U:32/big-unsigned>> = binary_part(B, S+1, 4),
-            decode_array(B, O, S+1+4, U, 1+4, []);
+            decode_array(B, O, S+1+4, U, []);
         %% map format family
         X when X >= <<16#80>>, X =< <<16#8f>> ->
             <<2#1000:4, U:4/big-unsigned>> = binary_part(B, S, 1),
-            decode_map(B, O, S+1, U, 1, #{});
+            decode_map(B, O, S+1, U, #{});
         <<16#de>> ->
             <<U:16/big-unsigned>> = binary_part(B, S+1, 2),
-            decode_map(B, O, S+1+2, U, 1+2, #{});
+            decode_map(B, O, S+1+2, U, #{});
         <<16#df>> ->
             <<U:32/big-unsigned>> = binary_part(B, S+1, 4),
-            decode_map(B, O, S+1+4, U, 1+4, #{});
+            decode_map(B, O, S+1+4, U, #{});
         %% ext format family
         <<16#c7>> ->
             <<U:8/big-unsigned, E>> = binary_part(B, S+1, 2),
-            decode_ext(B, O, S+1+2, E, U, 1+2);
+            decode_ext(B, O, S+1+2, E, U);
         <<16#c8>> ->
             <<U:16/big-unsigned, E>> = binary_part(B, S+1, 3),
-            decode_ext(B, O, S+1+3, E, U, 1+3);
+            decode_ext(B, O, S+1+3, E, U);
         <<16#c9>> ->
             <<U:32/big-unsigned, E>> = binary_part(B, S+1, 5),
-            decode_ext(B, O, S+1+5, E, U, 1+5);
+            decode_ext(B, O, S+1+5, E, U);
         <<16#d4>> ->
             <<E>> = binary_part(B, S+1, 1),
-            decode_ext(B, O, S+1+1, E, 1, 1+1);
+            decode_ext(B, O, S+1+1, E, 1);
         <<16#d5>> ->
             <<E>> = binary_part(B, S+1, 1),
-            decode_ext(B, O, S+1+1, E, 2, 1+1);
+            decode_ext(B, O, S+1+1, E, 2);
         <<16#d6>> ->
             <<E>> = binary_part(B, S+1, 1),
-            decode_ext(B, O, S+1+1, E, 4, 1+1);
+            decode_ext(B, O, S+1+1, E, 4);
         <<16#d7>> ->
             <<E>> = binary_part(B, S+1, 1),
-            decode_ext(B, O, S+1+1, E, 8, 1+1);
+            decode_ext(B, O, S+1+1, E, 8);
         <<16#d8>> ->
             <<E>> = binary_part(B, S+1, 1),
-            decode_ext(B, O, S+1+1, E, 16, 1+1);
+            decode_ext(B, O, S+1+1, E, 16);
         X ->
             error_badarg(X, O)
     end.
 
 
-decode_array(_B, _O, _S, 0, T, L) ->
-    {ok, lists:reverse(L), T};
-decode_array(B, O, S, C, T, L) ->
+decode_array(_B, _O, S, 0, L) ->
+    {ok, lists:reverse(L), S};
+decode_array(B, O, S, C, L) ->
     case decode_binary(B, O, S) of
         {ok, E, U} ->
-            decode_array(B, O, S+U, C-1, T+U, [E|L]);
+            decode_array(B, O, U, C-1, [E|L]);
         {error, Reason} ->
             {error, Reason}
     end.
 
-decode_ext(B, O, S, ?EXT_TUPLE, C, T) ->
-    decode_tuple(B, O, S, C, T, []);
-decode_ext(B, _O, S, _E, C, T) ->
-    {ok, binary_to_term(binary_part(B, S, C)), T+C}.
+decode_ext(B, O, S, ?EXT_TUPLE, C) ->
+    decode_tuple(B, O, S, C, []);
+decode_ext(B, _O, S, _E, C) ->
+    {ok, binary_to_term(binary_part(B, S, C)), S+C}.
 
-decode_map(_B, _O, _S, 0, T, M) ->
-    {ok, M, T};
-decode_map(B, O, S, C, T, M) ->
+decode_map(_B, _O, S, 0, M) ->
+    {ok, M, S};
+decode_map(B, O, S, C, M) ->
     case decode_binary(B, O, S) of
         {ok, K, KU} ->
-            case decode_binary(B, O, S + KU) of
+            case decode_binary(B, O, KU) of
                 {ok, V, VU} ->
-                    decode_map(B, O, S+KU+VU, C-1, T+KU+VU, maps:put(K, V, M));
+                    decode_map(B, O, VU, C-1, maps:put(K, V, M));
                 {error, Reason} ->
                     {error, Reason}
             end;
@@ -198,27 +198,27 @@ decode_map(B, O, S, C, T, M) ->
             {error, Reason}
     end.
 
-decode_str(B, _O, S, C, T) when ?U8_MAX >= C ->
+decode_str(B, _O, S, C) when ?U8_MAX >= C ->
     P = binary_part(B, S, C),
     try binary_to_existing_atom(P, utf8) of
         A ->
-            {ok, A, T+C}
+            {ok, A, S+C}
     catch
         error:badarg ->
-            {ok, P, T+C}
+            {ok, P, S+C}
     end;
-decode_str(B, _O, S, C, T) ->
-    {ok, binary_part(B, S, C), T+C}. % != badarg, == SystemLimitError
+decode_str(B, _O, S, C) ->
+    {ok, binary_part(B, S, C), S+C}. % != badarg, == SystemLimitError
 
-decode_tuple(_B, O, _S, 0, T, L) ->
+decode_tuple(_B, O, S, 0, L) ->
     U = length(L),
-    if ?U26_MAX >= U -> {ok, list_to_tuple(lists:reverse(L)), T};
+    if ?U26_MAX >= U -> {ok, list_to_tuple(lists:reverse(L)), S};
        true          -> error(U, O)
     end;
-decode_tuple(B, O, S, C, T, L) ->
+decode_tuple(B, O, S, C, L) ->
     case decode_binary(B, O, S) of
         {ok, E, U} ->
-            decode_tuple(B, O, S+U, C-U, T+U, [E|L]);
+            decode_tuple(B, O, U, C-(U-S), [E|L]);
         {error, Reason} ->
             {error, Reason}
     end.
