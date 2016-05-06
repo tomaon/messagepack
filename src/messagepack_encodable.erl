@@ -125,14 +125,14 @@ encode_string(S, O) ->
        true          -> error_badarg(S, O)
     end.
 
-encode_tuple(T, O) when ?U32_MAX >= tuple_size(T) -> % == ?U26_MAX (limit)
+encode_tuple(T, O) when ?U32_MAX >= tuple_size(T) -> % ?U26_MAX, limit(tuple)
     encode_tuple(tuple_to_list(T), O, []);
 encode_tuple(T, O) ->
     error_badarg(T, O).
 
 
 encode_any(T, O) when is_map(T) ->
-    case maps:is_key('__struct__', T) of % << defstruct
+    case maps:is_key('__struct__', T) of % defstruct
         true ->
             encode_map(T, O);
         false ->

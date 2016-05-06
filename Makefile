@@ -22,7 +22,7 @@ $(VERBOSE).SILENT:
 
 all: clean compile
 
-clean compile deps.get docs test: rm
+clean compile test: rm
 	$(ENV) $(MIX) $@
 
 cover: rm
