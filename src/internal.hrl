@@ -11,7 +11,7 @@
 -define(U7_MAX,  (1 bsl  7 - 1)).               % 127
 -define(U8_MAX,  (1 bsl  8 - 1)).               % 255
 -define(U16_MAX, (1 bsl 16 - 1)).               % 65535
--define(U26_MAX, (1 bsl 26 - 1)).               % 67108863
+%%efine(U26_MAX, (1 bsl 26 - 1)).               % 67108863
 %%efine(U29_MAX, (1 bsl 29 - 1)).               % 536870911
 -define(U32_MAX, (1 bsl 32 - 1)).               % 4294967295
 -define(U64_MAX, (1 bsl 64 - 1)).               % 18446744073709551615

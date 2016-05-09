@@ -198,22 +198,25 @@ decode_map(B, O, S, C, M) ->
             {error, Reason}
     end.
 
-decode_str(B, _O, S, C) when ?U8_MAX >= C ->
+decode_str(B, _O, S, C) ->
     P = binary_part(B, S, C),
     try binary_to_existing_atom(P, utf8) of
         A ->
             {ok, A, S+C}
     catch
         error:badarg ->
+            {ok, P, S+C};
+        error:system_limit -> % ?U8_MAX
             {ok, P, S+C}
-    end;
-decode_str(B, _O, S, C) ->
-    {ok, binary_part(B, S, C), S+C}. % != badarg, == SystemLimitError
+    end.
 
 decode_tuple(_B, O, S, 0, L) ->
-    U = length(L),
-    if ?U26_MAX >= U -> {ok, list_to_tuple(lists:reverse(L)), S};
-       true          -> error(U, O)
+    try list_to_tuple(lists:reverse(L)) of
+        T ->
+            {ok, T, S}
+    catch
+        error:badarg -> % != system_limit, < ?U26_MAX
+            error_badarg(io_lib:format("tuple_size=~p", [length(L)]), O)
     end;
 decode_tuple(B, O, S, C, L) ->
     case decode_binary(B, O, S) of
